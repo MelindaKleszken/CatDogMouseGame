@@ -11,10 +11,7 @@ SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 #name the game window 
-pygame.display.set_caption("Catch the mouse and avoid the dogs!")
-
-#define position
-#center = (255, 174)
+pygame.display.set_caption("Catch the mice while avoiding the dogs!")
 
 #Define Colors - RGB
 black = (0,0,0,1)
@@ -22,6 +19,9 @@ white = (255,255,255)
 green = (34,177,76)
 red = (255,0,0)
 blue = (38,110,193)
+
+lives = 3
+score = 0
 
 #define font name'
 font_name = pygame.font.match_font('helvetica')
@@ -42,41 +42,36 @@ def draw_text(surf, text, size, x, y):
 # set clock for framerate
 clock = pygame.time.Clock()
 
-# Set positions of graphics
-#background_position = [0, 0]
-
-#background image
-#background = pygame.image.load("background.png")
-
 #define pause
 def pause():
+    global exit
     paused = True
-    while paused:
+    while paused and not exit:
         for event in pygame.event.get ():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                exit = True
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = False
                 elif event.key == pygame.K_q:
-                    pygame.quit()
+                    exit = True
                     quit()
-        screen.fill(background, 1)
+        screen.blit(background, (0,0))
         draw_text(screen, "Paused", 50, 400, 300)
-        draw_text(screen, "Press P to continue or Q to quit", 35, 400, 300)
+        draw_text(screen, "Press P to continue or Q to quit", 35, 400, 400)
         pygame.display.update()
         clock.tick(5)        
 
 #define score
-def score(message):
+def draw_score():
     draw_text(screen, "Score: ", 25, 600, 50)
-    draw_text(screen, str(score), 40, 65, 525)
+    draw_text(screen, str(score), 25, 635, 50)
 
 #define lives
-def lives(message):
+def draw_lives():
     draw_text(screen, "Lives: ", 25, 600, 25)
-    draw_text(screen, str(lives), 40, 65, 525)
+    draw_text(screen, str(lives), 25, 635, 25)
 
 #set the player class
 class Player(pygame.sprite.Sprite):
@@ -176,55 +171,51 @@ all_sprites.add(player)
 
 
 def game_intro():
+    global exit
     intro = True
-    while intro:
+    while intro and not exit:
+        
         for event in pygame.event.get():
         #if player presses the x in the top right of the pygame window or quit the game
             if event.type == pygame.QUIT:
-                pygame.quit()
+                exit = True
                 #quit
             if event.type == pygame.KEYDOWN:
-                #if player press c stop intro and run game loop
+                #if player press space stop intro and run game loop
                 if event.key == K_SPACE:
                     intro = False
-                    # gameLoop()
+
                 #if player press Q quit pygame window
                 if event.key == pygame.K_q:
-                    game_over()
-                    pygame.quit()
-                    #quit
+                    exit = True
         #sets background
-        #screen.fill(green)
         screen.blit(background, (0,0))
 
         #sets text
-        draw_text(screen, "Let's catch the mouses!", 50, 400, 200)
+        draw_text(screen, "Let's catch the mice!", 50, 400, 200)
         draw_text(screen, "Control the cat with your keyboard.", 30, 400, 300)
-        draw_text(screen, "Collect as many mouses as possible while avoid dogs!", 30, 400, 400)
+        draw_text(screen, "Collect as many mice as possible while avoiding the dogs!", 30, 400, 400)
         draw_text(screen, "Press SPACE to start or Q to quit!", 25, 400, 500)
         #updates screen display
         pygame.display.update()
-        #clock.tick(15)
 
 def game_over():
+    global exit
     gameOver = True
-    while gameOver:
+    while gameOver and not exit:
         for event in pygame.event.get():
         #if player presses the x in the top right of the pygame window or quit the game
             if event.type == pygame.QUIT:
-                pygame.quit()
-                #quit
-                #break
+                exit = True
 
             if event.type == pygame.KEYDOWN:
                 #if player press s to start game loop
                 if event.key == pygame.K_SPACE:
                     gameOver = False
-                    game_intro()
+
                 #if player press Q quit pygame window
                 if event.key == pygame.K_q:
-                    pygame.quit()
-                    #quit
+                    exit = True
 
         #sets background
         screen.blit(background, (0,0))
@@ -232,7 +223,8 @@ def game_over():
         #sets text
         draw_text(screen, "Game Over!", 50, 400, 200)
         draw_text(screen, "Final Score: " + str(score), 50, 400, 300)
-        draw_text(screen, "Press SPACE to restart or q to exit!", 35, 400, 400)
+        draw_text(screen, "Press SPACE to restart or Q to exit!", 35, 400, 400)
+
         #updates screen display
         pygame.display.update()
         #clock.tick(15)
@@ -245,47 +237,33 @@ pygame.mixer.init()
 pygame.mixer.music.load("background_music.mp3")
 #loops music
 pygame.mixer.music.play(loops=-1)
-#game end sound: http://soundbible.com/1687-TomCat.html
-exit_sound = pygame.mixer.Sound("catEnd.ogg")
-#purr: http://soundbible.com/1002-Purring.html
-#happy_sound = pygame.mixer.Sound("purr.ogg")
-# Set the base volume for all sounds
-#happy_sound.set_volume(3)
-exit_sound.set_volume(5)
-
-#def redrawGameWindow():
-    #screen.blit(background, (0,0))
-    #font = pygame.font.SysFont("helvetica", 30, True)
-    #text = font.render("Score: " + str(score), 1, (black))
-    #screen.blit(text, (610, 10))
-    
-    #pygame.display.update()
 
 #define gameloop
 def gameLoop():
-    score = 0
+    global score
+    global lives
     lives = 3
+    score = 0
      
     running = True
-    while running:
+    while running and not exit:
+        screen.blit(background, (0, 0))
+        draw_lives()
+        draw_score()
         for event in pygame.event.get():
-        # Did the user hit a key?
+
             if event.type == KEYDOWN:
-                # Was it the Escape key? If so, stop the loop
                 if event.key == K_ESCAPE:
-                    #print("Final Score: " + str(score))
                     game_over()
                     running = False
                 if event.key == pygame.K_q:
-                    #print("Final Score: " + str(score))
                     game_over()
                     running = False
                 if event.key == pygame.K_p:
                     pause()
-            # Did the user click the window close button? If so, stop the loop
+
             elif event.type == QUIT:
                 game_over()
-                #print("Final Score: " + str(score))
                 running = False
 
             # Should we add a new enemy?
@@ -301,53 +279,46 @@ def gameLoop():
                 new_mouse = Mouse()
                 mouse.add(new_mouse)
                 all_sprites.add(new_mouse)
-            #elif lives == 0
-                #game_over()
-    
-    
-    # Refresh background and score:
-    #redrawGameWindow()
 
-    # Get the set of keys pressed and check for user input
-    pressed_keys = pygame.key.get_pressed()
-    player.update(pressed_keys)
+        # Get the set of keys pressed and check for user input
+        pressed_keys = pygame.key.get_pressed()
+        player.update(pressed_keys)
 
-    # Update the position of our enemies and mouse
-    enemies.update()
-    mouse.update()
+        # Update the position of our enemies and mouse
+        enemies.update()
+        mouse.update()
 
-    # Draw all our sprites
-    for entity in all_sprites:
-        screen.blit(entity.surf, entity.rect)
+        # Draw all our sprites
+        for entity in all_sprites:
+            screen.blit(entity.surf, entity.rect)
 
-    # Check if any enemies have collided with the player
-    if pygame.sprite.spritecollideany(player, enemies):
-        # check remaining lives
-        lives -= 1
-        print("Lives remained: " + str(lives))
-        running = True
+        # Check if any enemies have collided with the player
+        if pygame.sprite.spritecollideany(player, enemies):
+            # check remaining lives
+            #lives -= 1
+            #print("Lives remained: " + str(lives))
+            running = True
 
+        if pygame.sprite.spritecollideany(player, mouse):
+            #Continue the loop
+            running = True 
+        
+        elif lives == 0:
+            running = False
+            game_over()
+            #running = False
 
-    elif pygame.sprite.spritecollideany(player, mouse):
-        # If so, play happy purr:
-        #happy_sound.play()
+        # 60 frames per second rate
+        clock.tick(60)
 
-        #Continue the loop
-        running = True 
+        # Flip everything to the display
+        pygame.display.flip()
 
-    # 60 frames per second rate
-    clock.tick(60)
+#close pygame
+exit = False 
+while not exit:
 
-    # Flip everything to the display
-    screen.blit(background, (0, 0))
-    pygame.display.flip()
-
-    # 60 frames per second rate
-    #clock.tick(60)
-
-    #close pygame
-    pygame.quit()
-
-
-game_intro()
-gameLoop()
+    game_intro()
+    gameLoop()
+    game_over()
+pygame.quit()
