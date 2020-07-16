@@ -65,13 +65,13 @@ def pause():
 
 #define score
 def draw_score():
-    draw_text(screen, "Score: ", 25, 600, 50)
-    draw_text(screen, str(score), 25, 635, 50)
+    draw_text(screen, "Score: ", 25, 650, 50)
+    draw_text(screen, str(score), 25, 685, 50)
 
 #define lives
 def draw_lives():
-    draw_text(screen, "Lives: ", 25, 600, 25)
-    draw_text(screen, str(lives), 25, 635, 25)
+    draw_text(screen, "Lives: ", 25, 650, 25)
+    draw_text(screen, str(lives), 25, 685, 25)
 
 #set the player class
 class Player(pygame.sprite.Sprite):
